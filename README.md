@@ -1,17 +1,6 @@
 # front-knowledge
 前端知识要点记录
 
-<style type="text/css">
-    *{margin:0; padding:0; font-size:14px; color:#333; font-family: "微软雅黑"}
-    h1{ line-height:100px; text-align:center; font-size: 30px; border-bottom: 4px solid #c6c6c6;}
-    p{ line-height:45px; padding-left: 5%; border-bottom: 1px solid #d2d2d2!important;}
-    p:hover{ background:#e6e6e6;}
-    .title{ margin-top: 20px; font-size: 18px; color: #f00; line-height:40px; font-weight: 700; padding-left: 5%;}
-    @media screen and (max-width:640px){
-        p{ line-height: 55px;}
-    }
-</style>
-
 index.html 列出所有知识点
 
 answer.html 列出本人对应的观点(待更新)
