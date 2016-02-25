@@ -25,7 +25,7 @@
 <style type="text/css">
     *{margin:0; padding:0; font-size:14px; color:#333; font-family: "微软雅黑"}
     h1{ line-height:100px; text-align:center; font-size: 30px; border-bottom: 4px solid #c6c6c6;}
-    .answer{ /* display: none */ }
+    .answer{ display: none }
     .list{ line-height:25px; padding: 10px 0 10px 5%; border-bottom: 1px solid #d2d2d2; position:relative; min-height: 25px}
     .answer .list:last-child{ border-bottom:none; }
     .list .num{ position:absolute; cursor: pointer}
@@ -295,7 +295,338 @@
             oninput和onpropertychange这两个事件在ie9中通过右键菜单菜单中的剪切和删除命令删除内容的时候不会触发
         </div>
     </div>
+
+    <div class="list">
+        <span class="num" title="点击折叠">3、</span>
+        <div class="ct">
+            <h2>JavaScript数据类型,内存存储区域</h2>
+            基本数据类型：Number、String、Boolean、Undefined、Null。<BR>
+            复杂数据类型：Object。<br>
+
+            JavaScript变量类型分为原始类型（存放于栈中）、引用类型（存放于堆）。<BR>
+            栈：只有一个出口，遵循后进先出（就像一个筒子，往里面放硬币，最后放的硬币是你最先可以拿到的）。<BR>
+            堆：用于动态分配的对象，未能确定其大小的数据，存储在栈中的是一个指针，指向他的堆（就像你是你爹的儿子，存在一种关系）。<BR><BR>
+
+            <span class="red">注意：</span><br>
+            由此可见：栈效率高于堆，栈只能存储固定的数据。<br><br>
+
+            <span class="red">问题来了：String类型了？</span><br>
+            string类型存储在栈中，毋庸置疑，因为没法改变一个值的内容（它是只读的，看似修改，其实是创建一个新的string对象）<br>
+            <pre class="brush:javascript">
+                var str = "a";
+                var str1 = str; //未分配内存，str地址赋给str1
+                console.log( str1 ); // a;
+                str = "b";  //检测内存不存在，重新分配
+                console.log( str1 ); // a;
+            </pre>
+        </div>
+    </div>
+
+    <div class="list">
+        <span class="num" title="点击折叠">4、</span>
+        <div class="ct">
+            <h2>如果检测是否数组,对象</h2>
+            typeof、instanceof、constructor、toString、Object.prototype.toString、内置方法检测等方式<br>
+
+            <pre class="brush:javascript">
+                var toType = Object.prototype.toString;
+                typeof [];                                  // object
+                typeof {};                                  // object
+                [] instanceof Array;                        // true
+                [].constructor === Array;                   // true
+                toString.call([]) === "[object Array]";     // true
+                toType.call([]) === "[object Array]";       // true
+                [].push                                     // function push
+            </pre>
+            <span class="red">注意：</span><br>
+            typeof：不能检测引用类型<br>
+            constructor：指向可变<br>
+            toString.call( arguments ) //[object Object]<br>
+            toType.call( arguments ) //[object Arguments]<br>
+
+        </div>
+    </div>
+
+    <div class="list">
+        <span class="num" title="点击折叠">5、</span>
+        <div class="ct">
+            <h2>浏览器数据存储有哪些方式</h2>
+            1、cookie，每次HTTP请求头信息一起发送，有大小限制（4k）<br>
+            2、localStorage，本地存储，不兼容ie8（ie8 json格式）下，大小5M<br>
+            3、session，页面关闭失效<br>
+            4、userData，ie下有效，可以废了<br>
+        </div>
+    </div>
+
+    <div class="list">
+        <span class="num" title="点击折叠">6、</span>
+        <div class="ct">
+            <h2>cookie怎么操作</h2>
+            <pre class="brush:javascript">
+                // 存入cookie
+                var name = "setcookie";
+                var value = "front";
+                document.cookie = ( name + "=" + value );
+
+                // 获取cookie
+                if ( document.cookie.length > 0 ) {
+                    document.cookie;
+                }
+            </pre>
+        </div>
+    </div>
+
+    <div class="list">
+        <span class="num" title="点击折叠">7、</span>
+        <div class="ct">
+            <h2>严格模式有什么特点</h2>
+            消除语法不合理、不严谨、不安全之处，提高编译效率。<BR>
+
+            1、变量必须显式声明。
+            <pre class="brush:javascript">
+                "use strict";
+                v = 1;      //报错 v未声明
+            </pre>
+
+            2、某些情况下只允许静态绑定，就是方法属于哪个对象，在编译阶段就确定好，有利于效率提高。<BR>
+            作用域分两种：全局作用域，函数作用域。但严格模式下有eval作用域。<BR>
+            严格模式中函数作用域下eval用显式声明不在有全局作用域，它只属于自己，只能内部使用。
+            <pre class="brush:javascript">
+                "use strict";
+                var a = 1;
+                console.log( eval( "var a = 2; a " ) );     //2
+                console.log( a );                           //2
+            </pre>
+            <pre class="brush:javascript">
+                // chrome测试
+                ;(function(){
+                    "use strict";
+                    var a = 1;
+                    console.log( eval( "var a = 2; a " ) );     //2
+                    console.log( a );                           //1
+                })();
+            </pre>
+
+            3、this禁止指向全局对象。
+            <pre class="brush:javascript">
+                ;(function(){
+                    "use strict";
+                    console.log( this ); //undefined
+                })();
+            </pre>
+
+            4、禁止调用栈fn.caller。<BR>
+            5、禁止删除变量，开启configurable:true可删。
+            <pre class="brush:javascript">
+                var obj = Object.create( null, { 'val': {
+                    value: 1,
+                    configurable: true
+                }});
+                delete obj.val;
+            </pre>
+            6、禁止使用arguments.callee。<BR>
+            7、保留字 implements、interface、let、package、private、protected、public、static、yield。
+        </div>
+    </div>
+
+    <div class="list">
+        <span class="num" title="点击折叠">8、</span>
+        <div class="ct">
+            <h2>null,undefined区别</h2>
+            null表示没有对象。<BR>
+            undefined表示缺少值，就是还没定义（跟内部执行情况有关）。<BR><BR>
+            <span class="red">注意：</span><br>
+            null转换数值为0，undefined转换数值为NaN。
+        </div>
+    </div>
+
+    <div class="list">
+        <span class="num" title="点击折叠">9、</span>
+        <div class="ct">
+            <h2>eval是啥</h2>
+            “eval()是魔鬼”。<BR>
+            可以将字符串生成语句执行<BR>
+            eval()也带来了安全隐患，因为被执行的代码（例如从网络来）可能已被篡改。<BR><BR>
+            同理：setInterval()、setTimeout()、Function()构造函数传递字符串，大部分情况下，与使用eval()是类似的，因此要避免。<br><br>
+
+            <span class="red">注意：</span><br>
+            eval可以干扰作用域。<br>
+            Function不管在哪里执行，只看到全局作用域，可以避免本地变量污染。
+        </div>
+    </div>
+
+    <div class="list">
+        <span class="num" title="点击折叠">10、</span>
+        <div class="ct">
+            <h2>函数劫持是什么</h2>
+            通过替换JavaScript函数的实现来达到劫持这个函数调用的目的。<BR><BR>
+            原理：先保存原函数实现，然后替换为我们自己的函数实现，添加我们自己的处理逻辑后最终再调用原来的函数实现。
+        </div>
+    </div>
+
+    <div class="list">
+        <span class="num" title="点击折叠">11、</span>
+        <div class="ct">
+            <h2>setTimeout,setInterval</h2>
+            setInterval以指定周期调用函数。<BR>
+            setTimeout指定延迟后调用函数。<BR>
+            这两个是在你设定的一个时间点插入到JavaScript引擎维护的一个代码队列中，但并不会立即执行！<BR><BR>
+
+            <span class="red">注意：</span><br>
+            setInterval并不会按照指定的时间执行，JavaScript是单线程，一个任务没完成前始终挂起，<BR>
+            意思是setInterval里面有一个任务需要很长时间，那么必须等它执行完才会周期调用setInterval！<BR>
+            <pre class="brush:javascript">
+                setInterval( function() {
+                    fn( ); // 耗时超过100ms
+                }, 100 );
+
+                // 会推迟执行setInterval，当在270ms执行完，会在300ms继续调用setInterval
+                // 这里只间隔30ms！所以并不能保证按照预期的周期来执行
+                // 如果想保证执行周期怎么解决？
+                // setTimeout，不管你操作多久，什么时候谈框确定，都会在线程完后，指定时间触发
+            </pre>
+        </div>
+    </div>
+
+    <div class="list">
+        <span class="num" title="点击折叠">12、</span>
+        <div class="ct">
+            <h2>JavaScript兼容性</h2>
+            变态的时刻，ie为奇葩<BR>
+            1、getAttribute; ie可以常规属性的方法来获取<BR>
+            2、input.type; ie只读<BR>
+            3、window.event（事件）<BR>
+            4、event.x; ie下有，火狐没有<BR>
+            5、event.srcElement<BR>
+            6、document.getElementsByClassName<BR>
+            7、document.querySelector<BR>
+            。。。
+        </div>
+    </div>
+
+    <div class="list">
+        <span class="num" title="点击折叠">13、</span>
+        <div class="ct">
+            <h2>元素查找怎么优化</h2>
+            1、用id选择器，确定范围，缓存结果。再此内容区再查找需要的元素。<BR>
+            2、冒泡形式查找，寻找匹配的父级元素。
+        </div>
+    </div>
+
+    <div class="list">
+        <span class="num" title="点击折叠">14、</span>
+        <div class="ct">
+            <h2>json是什么</h2>
+            数据交换格式，基于ECMAScript的一个子集，键值对方式存在。
+        </div>
+    </div>
+
+    <div class="list">
+        <span class="num" title="点击折叠">15、</span>
+        <div class="ct">
+            <h2>怎么给String扩展方法</h2>
+            给内置对象扩展方法，需从原型上添加
+            <pre class="brush:javascript">
+                if ( !String.prototype.getStr ) {
+                    String.prototype.getStr = function( num ) {
+                        return this[ num || 0 ];
+                        //你想做的事情
+                    };
+                }
+            </pre>
+        </div>
+    </div>
+
+    <div class="list">
+        <span class="num" title="点击折叠">16、</span>
+        <div class="ct">
+            <h2>valueOf和toString有什么区别</h2>
+            valueOf：返回该对象类型的原始值。<BR>
+            toString: 将该对象的原始值以字符串形式返回。<BR>
+
+            这两个方法一般是交由JS去隐式调用，以满足不同的运算情况。<BR>
+            在数值运算里，会优先调用valueOf()。
+            <pre class="brush:javascript">
+                +"1"+2; //3
+            </pre>
+            在字符串运算里，会优先调用toString()。
+            <pre class="brush:javascript">
+                "1"+2; //12
+            </pre>
+        </div>
+    </div>
+
+    <div class="list">
+        <span class="num" title="点击折叠">17、</span>
+        <div class="ct">
+            <h2>html5新增哪些api</h2>
+            video、audio、canvas、webgl、localstorage、sessonstorage、websql、
+            indexedDB、websocket、Application Cache、worker、Geolocation API...
+        </div>
+    </div>
+
+    <div class="list">
+        <span class="num" title="点击折叠">18、</span>
+        <div class="ct">
+            <h2>Web Sql Database,IndexedDB有何优点缺点</h2>
+            都可做本地数据存储。<BR>
+            Web Sql Database：已经不在更新，火狐不兼容。实际上并不包含在HTML5规范之中。
+            它是一个独立的规范（不建议使用：代码更加复杂匿名内部类的内部函数，回调函数）。<BR><BR>
+            IndexedDB：轻量级NOSQL数据库，存在兼容性，将会代替web sql database
+        </div>
+    </div>
+
+    <div class="list">
+        <span class="num" title="点击折叠">19、</span>
+        <div class="ct">
+            <h2>离线存储优缺点,怎么更新</h2>
+            1、可离线访问应用。<BR>
+            2、可访问本地的缓存文件，速度更快。<BR>
+            3、仅仅加载被修改过的资源，降低了服务器的访问压力。<BR><BR>
+            离线存储 <= ie9 不支持<BR>
+            最大支持5M<BR><BR>
+
+            首次更新manifest时，因为页面加载已经开始或者已经完成，缓存还没来得及更新，浏览器仍使用过期的资源。<BR>
+            当Application cache有更新时候，第二次才会触发。这个时候需要监听updata事件。<BR>
+            首页不做离线缓存。
+            <pre class="brush:javascript">
+                window.applicationCache.addEventListener( "updateready", function() {
+                    window.location.reload();
+                });
+            </pre>
+
+            <span class="red">注意：</span><br>
+            更新执行过程：是否引用manifest、检测是否更新、manifest下载完成是否更新、触发下载事件、下载文件进度、是否有旧数据、更新缓存updateready事件。
+        </div>
+    </div>
+
+    <div class="list">
+        <span class="num" title="点击折叠">20、</span>
+        <div class="ct">
+            <h2>判断当前脚本运行在浏览器还是node环境中</h2>
+            通过判断Global对象是否为window，如果不为window，当前脚本没有运行在浏览器中。
+        </div>
+    </div>
+
+    <div class="list">
+        <span class="num" title="点击折叠">21、</span>
+        <div class="ct">
+            <h2>script标签放在底部的body封闭之前和封闭之后有什么区别,浏览器会如何解析它们</h2>
+            放在之前符合html标准包括html5标准，写在之后就是不符合标准。<BR>
+            放在之前之后都回解析。没有区别，写在之前之后最终还是在dom树里，script元素还是回成为body的子节点，会等dom文档加载完请求script标签<BR>
+        </div>
+    </div>
+
+    <div class="list">
+        <span class="num" title="点击折叠">22、</span>
+        <div class="ct">
+            <h2>检测浏览器版本有哪些方式</h2>
+            判断navigator.userAgent<BR>代码网上一搜很多
+        </div>
+    </div>
+
 </div>
+
 <div style="height:100px"></div>
 <script>
     $(document).ready(function(){
