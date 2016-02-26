@@ -627,7 +627,257 @@
 
 </div>
 
-<div style="height:100px"></div>
+<!-- 深入理解 -->
+<div class="title"><a href="answer.html" target="_blank">深入理解</a></div>
+<div class="answer">
+    <div class="list">
+        <span class="num" title="点击折叠">1、</span>
+        <div class="ct">
+            <h2>作用域执行情况</h2>
+            两个概念：<BR>
+            1、执行环境，也称执行上下文<BR>
+            上面我们说到执行环境三种：全局、自定义函数、eval函数。<BR>
+            函数调用时候回进入该函数对应的执行环境，如果又调用，那么再会创建一个新的执行环境，并且函数调用执行都存在此环境中！<BR><BR>
+
+            2、作用域，作用域链<BR>
+            作用域链就是一个上下文所有的变量对象
+            <pre class='brush: javascript'>
+                var x = 10;
+                var fn = function() {
+                    //var y->undefined
+                    var y = 20;
+                    console.log( x + y );   //30
+                }
+                fn();
+
+                // 执行情况
+                // fn里面var会声明前提，就是函数预解析，在代码执行时候会解析出变量和函数的定义
+                // 函数分为创建和激活阶段（调用时）
+                // 函数作用域链在函数创建时就创建，包含活动对象ao和这个函数内部或父级的变量对象vo
+                // 变量x并未在fn定义，不会存在fn的ao中（他能访问所以父变量对象层级链（vo）x=10）
+                // 变量y在fn定义（就是fn上下文活动对象ao），所以fn活动对象ao包含属性: y->undefined
+
+                // 根据上面意思，活动对象是作用域的第一个对象，被添加到顶端
+                // 在fn激活时（进入上下文），活动对象是：x->10,y->20
+            </pre>
+        </div>
+    </div>
+
+    <div class="list">
+        <span class="num" title="点击折叠">2、</span>
+        <div class="ct">
+            <h2>闭包是什么</h2>
+            闭包是代码块和创建该代码块的上下文中数据的结合，闭包会引用上下文数据，从而提高运算效率，同时增加内存占有率
+            <pre class='brush: javascript'>
+                var a = 10;
+                var fn = function() {
+                    console.log( a );
+                };
+                ( function() {
+                    var a = 20;
+                    fn();
+                    //由于上面作用域的情况，创建函数就决定作用域链
+                    //闭包创建的同时，上下文的数据就会保存起来
+                } )();
+            </pre>
+            <span class="red">注意：</span><br>
+            函数都是闭包，因为它们都是在创建的时候就保存了上下文的作用域链<BR>
+            即使创建它的上下文已经销毁，它仍然存在（比如，内部函数从父函数中返回，因为保存了上下文数据）
+        </div>
+    </div>
+
+    <div class="list">
+        <span class="num" title="点击折叠">3、</span>
+        <div class="ct">
+            <h2>哪些操作会内存泄漏,怎么解决</h2>
+            内存泄露：指一块被分配的内存既不能使用，又不能回收，直到浏览器进程结束<BR>
+            怎样让它回收：就是程序中没有变量引用某个对象，就回触发垃圾回收机制（从内存释放变量）！<BR>
+            内存泄露现在在单页面中比较严重，页面得不到释放，但是某些情况下刷新后还是没办法<BR><BR>
+
+            1、闭包引用
+            <pre class='brush: javascript'>
+                var outer = function() {
+                    var obj = {};
+                    var inner = function() {
+                        //这里引用了obj对象
+                    };
+                    obj.inner = inner;
+                };
+                //创建了obj、inner变量对象，这和作用域链有关，互相引用，闭包很容易循环引用
+            </pre>
+
+            2、dom引用：当dom元素或一个ActiveX对象与普通JavaScript对象之间存在循环引用时
+            <pre class='brush: javascript'>
+                var elem = document.getElementById( 'id' );
+                elem.onclick = function() {
+                    // elem引用了click回调事件，这就是为什么事件不能直接挂载在dom元素上的原因
+                };
+
+                //解决方法
+                var bindFn = function() {
+                    return function() {
+                        console.log( "html" );
+                    };
+                };
+                ( function() {
+                    var elem = document.getElementById( 'kk' );
+                    elem.onclick = bindFn();
+                    return elem;
+                } )();
+            </pre>
+
+            3、隐式转换类型ie下
+            <pre class="brush:javascript">
+                var str = "hello js";
+                console.log( str.length );
+                //这个是因为string本来没有length属性，在底层js引擎自动创建临时的string对象
+                //解决方案：
+                console.log( new String( str ).length );
+            </pre>
+        </div>
+    </div>
+
+    <div class="list">
+        <span class="num" title="点击折叠">4、</span>
+        <div class="ct">
+            <h2>this指向</h2>
+            this指向：可能是全局、构造函数、eval<BR>
+            this是执行上下文的一个属性（变量对象vo），this在进入上下文时确定，并且在上下文运行期间永久不变。<BR>
+            this调用函数的方式来决定。<BR><BR>
+            1、全局
+            <pre class='brush: javascript'>
+                console.log( this );        //window
+                var fn = function() {
+                    console.log( this );    //window
+                };
+                fn();
+            </pre>
+
+            2、构造函数
+            <pre class='brush: javascript'>
+                var Fn = function() {
+                    console.log( this );    //Fn
+                    // this指向了new创建了的对象，这里的this可以理解成Fn的一个副本（vo引用了实例）
+                };
+                new Fn();
+            </pre>
+
+            3、对象方法调用
+            <pre class='brush: javascript'>
+                var obj = {
+                    fn: function() {
+                        console.log( this );    //obj
+                    };
+                }
+                obj.fn();
+            </pre>
+
+            4、apply、call可以改变this指向
+            <pre class='brush: javascript'>
+                var obj = {};
+                var fn = function() {
+                    console.log( this );    //obj对象
+                };
+                fn.call( obj );
+            </pre>
+        </div>
+    </div>
+
+    <div class="list">
+        <span class="num" title="点击折叠">5、</span>
+        <div class="ct">
+            <h2>new,原型,原型链都做了什么</h2>
+            new：<BR>
+            1、创建一个空对象，并且this（变量对象vo）引用该对象，同时还继承了该函数的原型。<BR>
+            2、属性和方法被加入到this引用的对象中。<BR>
+            3、新创建的对象由this所引用，并且最后隐式的返回this。<BR><BR>
+
+            原型：每个对象内部属性，自动创建的隐藏属性<BR>
+            原型链：每个对象内部属性的属性<BR>
+
+            <pre class='brush: javascript'>
+                var Fn = function( a ) {
+                    this.a = a;
+                };
+                Fn.prototype.a = 2;
+                Fn.prototype.constructor = Fn;
+                var fn = new Fn( 1 );
+
+                console.log( fn.a === 1 );                                                  //true
+                console.log( fn.constructor === Fn );                                       //true
+                console.log( Fn.constructor === Function );                                 //true
+                console.log( Fn.prototype.constructor === Fn );                             //true
+                console.log( Fn.prototype.constructor.constructor === Function );           //true
+                //fn是Fn的实例
+                //Fn的constructor为什么是Funciton，因为Fn是构造函数，向上查找原型链，直到顶级Function
+            </pre>
+        </div>
+    </div>
+
+    <div class="list">
+        <span class="num" title="点击折叠">6、</span>
+        <div class="ct">
+            <h2>继承实现方式</h2>
+            对象冒充，apply、call，prototype，拷贝继承，创建空对象，Object.create
+            <pre class='brush: javascript'>
+                function Parent( age ) {
+                    this.name = "coco";
+                    this.age = age;
+                }
+                Parent.prototype.run = function() {
+                    return this.name  + ' || ' + this.age;
+                };
+                function Child( age ){
+                    Parent.call( this, age );       //对象冒充，给超类型传参
+                }
+                Child.prototype = new Parent();     //原型链继承
+                var test = new Child( 20 );
+                alert( test.run() );
+                //复制粘贴一瞬间
+            </pre>
+
+            <pre class="brush:javascript">
+                var extend = function( Child, Parent ) {
+                    var F = function(){};
+                    F.prototype = Parent.prototype;
+                    Child.prototype = new F();
+                    Child.prototype.constructor = Child;
+                    Child.uber = Parent.prototype;
+                };
+
+                var Animal = function() {};
+                var Cat = function() {};
+                Animal.prototype.species = "动物";
+
+                extend( Cat, Animal );
+                var cat1 = new Cat();
+                alert( cat1.species ); // 动物
+
+            </pre>
+        </div>
+    </div>
+
+    <div class="list">
+        <span class="num" title="点击折叠">7、</span>
+        <div class="ct">
+            <h2>call,apply</h2>
+            用另一个对象替换当前对象，可改变函数的对象执行上下文。<BR>
+            call：
+            <pre class='brush: javascript'>
+                var obj = {
+                    num: 1
+                };
+                var fn = function( num ) {
+                    console.log( typeof num )
+                    console.log( this.num , num );
+                };
+                fn.call( obj, 2 );                  //1,2
+                fn.apply( obj, [ 20, 30 ] );        //1,20
+            </pre>
+        </div>
+    </div>
+</div>
+<div style="height:100px" id="kk"></div>
 <script>
     $(document).ready(function(){
         SyntaxHighlighter.all();
@@ -639,6 +889,10 @@
             $( this).next().toggle();
         });
     });
+
 </script>
 </body>
 </html>
+
+
+
