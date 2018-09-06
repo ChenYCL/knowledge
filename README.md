@@ -1,9 +1,9 @@
 # front-knowledge
 前端知识要点记录
 
-### vue
-### 1、vue钩子函数有哪些
-### 2、beforecreate做了哪些事情
+## vue
+##### 1、vue钩子函数有哪些
+##### 2、beforecreate做了哪些事情
 3、render函数是什么
 4、computed，watch，methods之间的区别
 5、编写一个指令
